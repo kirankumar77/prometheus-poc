@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    scrape_configs:
+      - job_name: 'federate'
+        scrape_interval: 15s
+        honor_labels: true
+        metrics_path: '/federate'
+        params:
+          'match[]':
+            - '{job=~"apache-exporter|kube-state-metrics|kubernetes-cadvisor"}'
+            - '{__name__=~"job:.*"}'
+        static_configs:
+          - targets:
+            - '10.128.0.52:30279'
+            - '10.128.0.56:31628'
